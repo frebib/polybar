@@ -14,6 +14,7 @@
 #include "utils/math.hpp"
 #include "utils/memory.hpp"
 #include "utils/process.hpp"
+#include "utils/unit.hpp"
 #include "x11/background_manager.hpp"
 #include "x11/ewmh.hpp"
 #include "x11/icccm.hpp"
@@ -92,7 +93,10 @@ void tray_manager::setup(const bar_settings& bar_opts) {
     m_opts.height--;
   }
 
-  auto maxsize = conf.get<unsigned int>(bs, "tray-maxsize", 16);
+  auto maxsize_value = conf.get<string>(bs, "tray-maxsize", "16pt");
+  auto maxsize_geom = unit_utils::parse_extent(move(maxsize_value));
+  auto maxsize = unit_utils::extent_to_pixel(maxsize_geom, bar_opts.dpi_x);
+  m_log.info("tray: setting maxsize to \"%d\"", maxsize);
   if (m_opts.height > maxsize) {
     m_opts.spacing += (m_opts.height - maxsize) / 2;
     m_opts.height = maxsize;

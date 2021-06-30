@@ -135,7 +135,8 @@ renderer::renderer(connection& conn, signal_emitter& sig, const config& conf, co
       string pattern{f};
       size_t pos = pattern.rfind(';');
       if (pos != string::npos) {
-        offset = std::strtol(pattern.substr(pos + 1).c_str(), nullptr, 10);
+        auto offset_geom = unit_utils::parse_extent(move(pattern.substr(pos + 1)));
+        offset = unit_utils::point_to_pixel(offset_geom, m_bar.dpi_x);
         pattern.erase(pos);
       }
       auto font = cairo::make_font(*m_context, string{pattern}, offset, m_bar.dpi_x, m_bar.dpi_y);
